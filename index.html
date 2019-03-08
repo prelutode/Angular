@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+<style>
+  table, th , td  {
+    border: 1px solid grey;
+    border-collapse: collapse;
+    padding: 5px;
+    text-align: center;
+  }
+  table tr:nth-child(odd) {
+    background-color: #f1f1f1;
+  }
+  table tr:nth-child(even) {
+    background-color: #ffffff;
+  }
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+<body>
+
+  <div ng-app="myApp" ng-controller="myCtrl">
+    <!--Contenedor de la listas de reproducción-->
+    <div>
+      <p>LIST COLLECTION</p>
+      <span>Filter by name <input type="text" ng-model="filterList"></span><input type="button" id="filterButton" value="Add List"
+        ng-click="addList()"><br><br>
+      <table id="listsTable">
+        <tr>
+          <th>Id</th>
+          <th>Name</th>
+          <th>Total Songs</th>
+          <th>Duration (min)</th>
+        </tr>
+        <tr ng-repeat="list in lists | filter:{name:filterList}">
+          <td>{{ list.id }}</td>
+          <td>{{ list.name }}</td>
+          <td>{{ totalSongsList(list.songs) }}</td>
+          <td>{{ durationList(list.songs) }}</td>
+          <td><button ng-click="showSongsList(list.songs,list)">Edit</button></td>
+          <td><button ng-click="removeList($index)">Remove</button></td>
+        </tr>
+      </table>
+      <br>
+    </div>
+    <!--Contenedor de las canciones que pertenecen a la lista seleccionada-->
+    <div ng-show="showList">
+      <p>LIST SONGS FROM "{{lists[selectList].name}}"</p>
+      <!--Implementamos filtro para buscar canciones-->
+      <span>Filter by title <input type="text" ng-model="filterSongList"></span><button ng-click="showAllSongs(); diffArrays(songs, songsList)">Add
+        Song to List</button>
+      <p>Click the table headers to change the sorting order:</p>
+      <table>
+        <tr>
+          <th ng-click="orderByMe('id')">Id</th>
+          <th ng-click="orderByMe('title')">Title</th>
+          <th ng-click="orderByMe('author')">Author</th>
+          <th ng-click="orderByMe('style')">Style</th>
+          <th ng-click="orderByMe('duration')">Duration</th>
+        </tr>
+        <!--Habilitamos ordenación de los datos por cualquiera de sus campos-->
+        <tr ng-repeat="song in songsList | orderBy:myOrderBy2 | filter:{title:filterSongList}">
+          <td>{{ song.id }}</td>
+          <td>{{ song.title }}</td>
+          <td>{{ song.author }}</td>
+          <td>{{ song.style }}</td>
+          <td>{{ song.duration }}</td>
+          <td><button ng-click="removeSong($index,selectList)">Remove from the List</button></td>
+        </tr>
+      </table>
+    </div>
+    <!--Contenedor de las posibles canciones que se pueden agregar a la lista seleccionada. Muestra únicamente las que no están en la lista-->
+    <div ng-show="showSongs">
+      <p>SELECT SONG</p>
+      <!--Implementamos filtro para buscar canciones-->
+      <p>Filter by title <input type="text" ng-model="filterSong"></p>
+      <p>Click the table headers to change the sorting order:</p>
+      <table>
+        <tr>
+          <th ng-click="orderByMe2('id')">Id</th>
+          <th ng-click="orderByMe2('title')">Title</th>
+          <th ng-click="orderByMe2('author')">Author</th>
+          <th ng-click="orderByMe2('style')">Style</th>
+          <th ng-click="orderByMe2('duration')">Duration</th>
+        </tr>
+        <!--Habilitamos ordenación de los datos por cualquiera de sus campos-->
+        <tr ng-repeat="song in notSongsSelect | orderBy:myOrderBy3 | filter:{title:filterSong} | limitTo: limit">
+          <td>{{ song.id }}</td>
+          <td>{{ song.title }}</td>
+          <td>{{ song.author }}</td>
+          <td>{{ song.style }}</td>
+          <td>{{ song.duration }}</td>
+          <td><button ng-click="addSong($index)">Add to List</button></td>
+        </tr>
+      </table>
+      <!--Generamos botones para mostrar más o menos canciones a añadir a la lista-->
+      <button ng-click="increaseLimit()">+</button><button ng-click="decreaseLimit()">-</button>
+    </div>
+  </div>
+
+  <script>
+    var app = angular.module('myApp', []);
+    app.controller('myCtrl', function ($scope, $http) {
+
+      $scope.orderByMe = function (x) {
+        $scope.myOrderBy2 = x;
+      };
+
+      $scope.orderByMe2 = function (x) {
+        $scope.myOrderBy3 = x;
+      };
+      //Obtenemos el JSON de las listas de reprodución
+      $http.get("lists.json").then(function (response) {
+        $scope.lists = response.data.lists;
+      });
+      //Obtenemos el JSON de canciones
+      $http.get("songs.json").then(function (response) {
+        $scope.songs = response.data.songs;
+      });
+
+      //Ocultamos los contenedores de las canciones presentes y potencialmente agregadas de la lista seleccionada
+      $scope.showList = false;
+      $scope.showSongs = false;
+
+      //Mostramos el contenedor con las canciónes a añadir a la lista de reproducción seleccionada
+      $scope.showAllSongs = function () {
+        $scope.showSongs = !$scope.showSongs;
+      };
+      //Cálculo del número de canciones de las listas
+      $scope.totalSongsList = function (x) {
+        songnum = x.length;
+        return songnum;
+      };
+      //Cálculo de la duración de las canciones de las listas
+      $scope.durationList = function (x) {
+        duration = 0;
+        for (i = 0; i < x.length; i++) {
+          for (j = 0; j < $scope.songs.length; j++) {
+            if ($scope.songs[j].id == x[i]) {
+              duration += parseInt($scope.songs[j].duration);
+            }
+          }
+        }
+        return duration;
+      };
+      //Añadimos nueva lista de reproducción
+      $scope.addList = function () {
+        $scope.lists.push({
+          id: $scope.lists.length + 1,
+          name: $scope.filterList,
+          songsnum: 0,
+          duration: 0,
+          songs: []
+        });
+        $scope.filterList = "";
+      };
+      //Eliminamos lista de reproducción seleccionada
+      $scope.removeList = function (index) {
+        $scope.lists.splice(index, 1);
+        $scope.showList = false;
+        $scope.showSongs = false;
+      };
+      //Mostramos el contenedor con las canciones que forman parte de la lista activa
+      $scope.showSongsList = function (x, y) {
+        $scope.showList = true;
+        $scope.showSongs = false;
+        for (i = 0; i < $scope.lists.length; i++) {
+          if ($scope.lists[i].name == y.name) {
+            $scope.selectList = i;
+          }
+        }
+        array = [];
+        for (i = 0; i < x.length; i++) {
+          for (j = 0; j < $scope.songs.length; j++) {
+            if ($scope.songs[j].id == x[i]) {
+              array[i] = $scope.songs[j];
+            }
+          }
+        }
+        $scope.songsList = array;
+        $scope.filterList = "";
+      };
+      //Añadimos canción a la lista activa
+      $scope.addSong = function (x) {
+        $scope.lists[$scope.selectList].songs.push($scope.songs[x].id);
+      };
+      //Eliminamos canción de la lista activa
+      $scope.removeSong = function (index, y) {
+        $scope.lists[y].songs.splice(index, 1);
+        $scope.songsList.splice(index, 1);
+      };
+      //Establecemos el límite de canciones visibles a agregar a la lista activa
+      $scope.limit = 5;
+      //Mostramos 5 canciones más de las posibles a agregar a la lista
+      $scope.increaseLimit = function () {
+        if ($scope.limit >= $scope.songs.length) {
+          $scope.limit = $scope.songs.length;
+        } else {
+          $scope.limit = $scope.limit + 5;
+        }
+      };
+      //Reducimos en 5 las canciones a mostrar de las posibles a agregar a la lista
+      $scope.decreaseLimit = function () {
+        $scope.limit = $scope.limit - 5;
+        if ($scope.limit <= 5) {
+          $scope.limit = 5;
+        }
+      };
+      //Obtenemos un array diferencia entre el conjunto total de canciones y las presentes en la lista seleccionada. Así sólo mostramos
+      //las que no tenemos en nuestra lista
+      $scope.diffArrays = function (a1, a2) {
+        var result = [];
+        for (var i = 0; i < a1.length; i++) {
+          if (a2.indexOf(a1[i]) === -1) {
+            result.push(a1[i]);
+          }
+        }
+        console.log(result);
+        $scope.notSongsSelect = result;
+      }
+    });
+  </script>
+
+</body>
+
+</html>

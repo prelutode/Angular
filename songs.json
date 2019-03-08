@@ -1,0 +1,113 @@
+{"songs":[{
+        "id": 1,
+        "title": "songa",
+        "author": "author3",
+        "style": "style1",
+        "duration": 4
+    },
+    {
+        "id": 2,
+        "title": "songw",
+        "author": "author2",
+        "style": "style2",
+        "duration": 3
+    },
+    {
+        "id": 3,
+        "title": "songt",
+        "author": "author3",
+        "style": "style2",
+        "duration": 5
+    },
+    {
+        "id": 4,
+        "title": "songr",
+        "author": "author4",
+        "style": "style5",
+        "duration": 3
+    },
+    {
+        "id": 5,
+        "title": "songl",
+        "author": "author2",
+        "style": "style7",
+        "duration": 3
+    },
+    {
+        "id": 6,
+        "title": "songb",
+        "author": "author3",
+        "style": "style2",
+        "duration": 5
+    },
+    {
+        "id": 7,
+        "title": "songh",
+        "author": "author4",
+        "style": "style1",
+        "duration": 2
+    },
+    {
+        "id": 8,
+        "title": "songq",
+        "author": "author5",
+        "style": "style3",
+        "duration": 4
+    },
+    {
+        "id": 9,
+        "title": "songe",
+        "author": "author5",
+        "style": "style2",
+        "duration": 5
+    },
+    {
+        "id": 10,
+        "title": "songo",
+        "author": "author5",
+        "style": "style5",
+        "duration": 3
+    },
+    {
+        "id": 11,
+        "title": "songu",
+        "author": "author5",
+        "style": "style4",
+        "duration": 2
+    },
+    {
+        "id": 12,
+        "title": "songs",
+        "author": "author5",
+        "style": "style2",
+        "duration": 1
+    },
+    {
+        "id": 13,
+        "title": "songf",
+        "author": "author5",
+        "style": "style2",
+        "duration": 2
+    },
+    {
+        "id": 14,
+        "title": "songm",
+        "author": "author5",
+        "style": "style2",
+        "duration": 2
+    },
+    {
+        "id": 15,
+        "title": "songn",
+        "author": "author5",
+        "style": "style2",
+        "duration": 2
+    },
+    {
+        "id": 16,
+        "title": "songy",
+        "author": "author5",
+        "style": "style2",
+        "duration": 2
+    }
+]}
